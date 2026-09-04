@@ -135,12 +135,26 @@ export async function batchSiteSpeedTest(
   return probeMap;
 }
 
+function classifySpeed(speedMs: number): string {
+  if (speedMs <= 200) return 'very-fast';
+  if (speedMs <= 800) return 'fast';
+  if (speedMs <= 1500) return 'normal';
+  if (speedMs <= 3000) return 'slow';
+  return 'very-slow';
+}
+
 export function appendSpeedToName(sites: TVBoxSite[], speedMap: Map<string, SiteProbeResult>): TVBoxSite[] {
   return sites.map((site) => {
     const probe = speedMap.get(site.key);
     if (!probe || probe.speedMs == null) return site;
-    const seconds = (probe.speedMs / 1000).toFixed(1);
-    return { ...site, name: `${site.name || site.key} [${seconds}s]` };
+    const ms = probe.speedMs;
+    const seconds = (ms / 1000).toFixed(1);
+    const label = classifySpeed(ms);
+    // Append human-readable latency and label to name
+    const newName = `${site.name || site.key} [${ms}ms ${label}]`;
+    // Attach numeric and label info into ext for programmatic consumption
+    const newExt = (typeof site.ext === 'string' || site.ext == null) ? { probeSpeedMs: ms, probeSpeedLabel: label } : { ...(site.ext as Record<string, unknown>), probeSpeedMs: ms, probeSpeedLabel: label };
+    return { ...site, name: newName, ext: newExt };
   });
 }
 
@@ -195,4 +209,3 @@ function getTestableUrl(site: TVBoxSite): string | null {
 
   return null;
 }
-

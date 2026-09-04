@@ -35,6 +35,7 @@ export const KV_SOURCE_HEALTH = 'source_health';
 
 // 站点测速开关（默认启用）
 export const KV_SPEED_TEST_ENABLED = 'speed_test_enabled';
+export const KV_PREFER_LATENCY = 'prefer_latency';
 
 // TVBox 客户端 UA（源服务器按此 UA 返回 JSON 而非 HTML）
 export const TVBOX_UA = 'okhttp/3.12.0';

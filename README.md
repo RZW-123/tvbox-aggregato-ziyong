@@ -2,7 +2,10 @@
 
 将多个 TVBox 配置源合并成一个稳定的聚合地址。自动测速筛选、站点级去重、Spider JAR 智能分配。
 
-支持三种部署方式：**Cloudflare Worker**（免费）、**Docker**（一行命令）、**本地运行**（一键脚本）。
+支持三种部署方式：**Docker**（一行命令）、**本地运行**（一键脚本）。
+
+> NOTE: Cloudflare Worker deployment has been archived and removed from the main branch. If you need the original Cloudflare Worker configuration and entrypoint, see the archive branch:
+> https://github.com/RZW-123/tvbox-aggregato-ziyong/tree/archive-cfworker
 
 ## 功能
 
@@ -47,15 +50,6 @@ docker compose up -d
 ```
 
 完成！访问 `http://你的IP:5678/admin` 管理源。
-
-### 常用命令
-
-```bash
-docker compose logs -f      # 查看日志
-docker compose restart      # 重启
-docker compose down         # 停止
-docker compose up -d --build  # 重新构建并启动
-```
 
 ---
 
@@ -102,59 +96,6 @@ nohup node scripts/start.js > tvbox.log 2>&1 &
 
 ---
 
-## 部署方式三：Cloudflare Worker
-
-免费，不需要自己的服务器。适合有 Cloudflare 账号的用户。
-
-### 1. 准备环境
-
-- [Cloudflare 账号](https://dash.cloudflare.com/sign-up)（免费）
-- Node.js 18+
-
-### 2. 克隆仓库
-
-```bash
-git clone https://gitee.com/tengxiaobao/tvbox-source-aggregator.git
-cd tvbox-source-aggregator
-npm install
-```
-
-### 3. 登录 Cloudflare
-
-```bash
-npx wrangler login
-```
-
-### 4. 创建 KV 存储
-
-```bash
-npx wrangler kv namespace create KV
-npx wrangler kv namespace create KV --preview
-```
-
-将输出的 `id` 和 `preview_id` 填入 `wrangler.toml`。
-
-### 5. 设置密码
-
-```bash
-echo "your-admin-password" | npx wrangler secret put ADMIN_TOKEN
-```
-
-### 6. 部署
-
-```bash
-npm run deploy
-```
-
-### 7. 自定义域名（推荐）
-
-Workers 默认的 `*.workers.dev` 域名在部分网络环境下不可直接访问。如果你有托管在 Cloudflare 的域名：
-
-1. 在 Cloudflare DNS 添加记录：`AAAA tvbox 100::` （已代理）
-2. 取消 `wrangler.toml` 中 `routes` 的注释，填入你的域名和 Zone ID
-
----
-
 ## 使用
 
 ### 添加源
@@ -195,11 +136,6 @@ http://你的地址:5678/
 ZBAPE_API_KEY=your-api-key
 ```
 
-**Cloudflare Worker**：
-```bash
-echo "your-api-key" | npx wrangler secret put ZBAPE_API_KEY
-```
-
 开启后，每次聚合会自动测速并过滤高延迟源。
 
 ---
@@ -220,20 +156,17 @@ echo "your-api-key" | npx wrangler secret put ZBAPE_API_KEY
 │   │   └── config.ts      # 配置常量
 │   ├── storage/           # 存储抽象层
 │   │   ├── interface.ts   # Storage 接口
-│   │   ├── kv.ts          # Cloudflare KV 适配
 │   │   ├── sqlite.ts      # SQLite 实现
 │   │   └── json-file.ts   # JSON 文件降级
 │   ├── routes.ts          # HTTP 路由（Hono）
 │   ├── aggregator.ts      # 聚合流程编排
-│   ├── cf-entry.ts        # Cloudflare Worker 入口
-│   └── node-entry.ts      # Node.js 入口
+│   ├── node-entry.ts      # Node.js 入口
 ├── scripts/
 │   ├── start.js           # 一键启动脚本
 │   └── build.js           # Node.js 构建脚本
 ├── Dockerfile
 ├── docker-compose.yml
 ├── .env.example           # 环境变量模板
-├── wrangler.toml          # CF Worker 配置
 └── package.json
 ```
 

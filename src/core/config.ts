@@ -101,3 +101,9 @@ export const CHANNEL_PROBE_CONCURRENCY = 50;
 export const CHANNEL_PROBE_TIMEOUT_MS = 5000;
 // 缓存过期（7 天）
 export const CHANNEL_SPEED_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+// === 新增：站点测速并发与批次预算（Admin 可配置） ===
+export const KV_SPEEDTEST_CONCURRENCY = 'speedtest_concurrency';
+export const KV_SPEEDTEST_BATCH_BUDGET_MS = 'speedtest_batch_budget_ms';
+export const DEFAULT_SPEEDTEST_CONCURRENCY = 30;
+export const DEFAULT_SPEEDTEST_BATCH_BUDGET_MS = 180000; // 3 minutes

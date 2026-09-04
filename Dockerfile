@@ -20,12 +20,16 @@ RUN npm ci --omit=dev --ignore-scripts --registry https://registry.npmmirror.com
     apk del python3 make g++
 COPY --from=builder /app/dist ./dist
 
-RUN mkdir -p /app/data
-VOLUME /app/data
+# Use /data as the canonical data directory to match common docker-compose mappings
+RUN mkdir -p /data && chown -R node:node /data /app
+VOLUME /data
 
 ENV PORT=5678
-ENV DATA_DIR=/app/data
+ENV DATA_DIR=/data
 ENV TZ=Asia/Shanghai
 EXPOSE 5678
+
+# Run as unprivileged node user for better security
+USER node
 
 CMD ["node", "dist/server.js"]
